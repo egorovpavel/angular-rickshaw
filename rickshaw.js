@@ -141,19 +141,32 @@ angular.module('angular-rickshaw', [])
                                 if (scope.features.xAxis.timeUnit) {
                                     var time = new Rickshaw.Fixtures.Time();
                                     xAxisConfig.timeUnit = time.unit(scope.features.xAxis.timeUnit);
+                                    if (!xAxis) {
+                                        xAxis = new Rickshaw.Graph.Axis.Time(xAxisConfig);
+                                        xAxis.render();
+                                    }
+                                    else {
+                                        // Update xAxis if Rickshaw allows it in future.
+                                    }
                                 }
-                                if (scope.features.xAxis.tickFormat) {
-                                    xAxisConfig.tickFormat = scope.features.xAxis.tickFormat;
-                                }
-                                if (scope.features.xAxis.ticksTreatment) {
-                                    xAxisConfig.ticksTreatment = scope.features.xAxis.ticksTreatment;
-                                }
-                                if (!xAxis) {
-                                    xAxis = new Rickshaw.Graph.Axis.X(xAxisConfig);
-                                    xAxis.render();
+                                else if(scope.features.xAxis.autoTime){
+                                    if (!xAxis) {
+                                        xAxis = new Rickshaw.Graph.Axis.Time(xAxisConfig);
+                                        xAxis.render();
+                                    }
+                                    else {
+                                        // Update xAxis if Rickshaw allows it in future.
+                                    }
                                 }
                                 else {
-                                    // Update xAxis if Rickshaw allows it in future.
+                                    if (!xAxis) {
+                                        xAxis = new Rickshaw.Graph.Axis.X(xAxisConfig);
+                                        xAxis.render();
+                                    }
+                                    else {
+
+                                        // Update xAxis if Rickshaw allows it in future.
+                                    }
                                 }
                             }
                             else {
@@ -236,14 +249,21 @@ angular.module('angular-rickshaw', [])
                     angular.element($window).on('resize', function() {
                         scope.$broadcast('rickshaw::resize');
                     });
-                    
+
+
                     scope.$on('rickshaw::resize', function() {
                         redraw();
                     });
-                    
+
+                    scope.$watch(function () {
+                        return [element[0].clientWidth, element[0].clientHeight].join('x');
+                    },function (size) {
+                        scope.$broadcast('rickshaw::resize');
+                    });
+
                     updateConfiguration();
                 },
-                controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-                }]
+                controller: function($scope, $element, $attrs) {
+                }
             };
         }]);
